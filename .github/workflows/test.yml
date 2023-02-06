@@ -1,0 +1,35 @@
+name: Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number to print (just prints for now, will add auto versioning later)'
+        default: '0.0.0-0'
+        required: true
+      develop:
+        description: 'Develop branch name'
+        default: 'develop'
+        required: false
+      release:
+        description: 'Release branch name'
+        default: 'release'
+        required: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set Git config
+      run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "Github Actions"
+    - name: Merge dev onto release
+      run: |
+          git fetch --unshallow
+          git checkout ${{ inputs.release }}
+          git merge ${{ inputs.develop }} -m "Auto-merge develop for version ${{ inputs.version }}"
+          git push
